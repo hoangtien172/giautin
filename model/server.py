@@ -161,10 +161,10 @@ def server_program():
     data = '' 
     # count = 0
     while True:
-        # pcap_filename = capture_packets()
-        # csv_filename = convert_pcap_to_csv(pcap_filename)
-        # print("------------", csv_filename)
-        csv_filename = 'data_examples/flows1.csv'
+        pcap_filename = capture_packets()
+        csv_filename = convert_pcap_to_csv(pcap_filename)
+        print("------------", csv_filename)
+        csv_filename = 'model/data_examples/flows1.csv'
         data = convert_data(csv_filename)
         if data is None:
             continue
@@ -219,51 +219,3 @@ if __name__ == '__main__':
     server_program()
 
 
-# def server_program():
-#     global predicted_results
-#     host = "0.0.0.0"
-#     port = 5000
-
-#     server_socket = socket.socket()
-#     server_socket.bind((host, port))
-
-#     server_socket.listen(2)
-#     conn, address = server_socket.accept()
-#     data = ''
-#     count = 0
-#     while True:
-#         recv = conn.recv(2048)
-#         if not recv:
-#             continue
-#         flow_data = json.loads(recv.decode())
-#         csv_data = json_to_csv_string(flow_data)
-#         # Modify the next line to match the expected input format for m.load_data()
-#         m.load_data(csv_data)
-#         results = m.predict()
-#         print(results)
-#         predicted_results = data_processing(predicted_results, results)
-#         print(predicted_results)
-#         req = requests.get('http://0.0.0.0:7777/reset_status')
-#         reset_details = req.json()
-#         print(reset_details)
-#         print(reset_details['reset_boolean'], type(reset_details['reset_boolean']))
-#         if reset_details['reset_boolean'] == 'True':
-#             print('Resetttttttt!')
-#             predicted_results = {
-#                 "Bot": 0,
-#                 "DoS attack": 0,
-#                 "Brute Force": 0,
-#                 "DDoS attacks": 0,
-#                 "0": 0
-#             }
-#             requests.post('http://0.0.0.0:7777/reset_status')
-#         requests.post('http://0.0.0.0:7777/post-predict', json=predicted_results)
-
-#         count += 1
-#         if count == 10:
-#             data = ''
-#             count = 0
-
-
-# if __name__ == '__main__':
-#     server_program()

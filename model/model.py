@@ -59,8 +59,8 @@ class model:
         self.number_to_label = {1 : "Bot",2 : 'DoS attack',3 : 'Brute Force', 5 : 'DDoS attacks',4 : 0}
         # load the pretrained model 
         try:
-            self.model = load('./decision_tree_model.joblib')
-            self.attack_model = load('./attack_model.joblib')
+            self.model = load('model/decision_tree_model.joblib')
+            self.attack_model = load('model/attack_model.joblib')
         except:
             # error if model can't be found in the path
             logging.error("Model can\'t be found in the main directory")
@@ -68,8 +68,8 @@ class model:
 
         # load the features for the preprocessing step
         try:
-            self.all_features = open("./all_features.txt", "r").readline().split(',')
-            self.features = open("./features.txt", "r").read().splitlines()
+            self.all_features = open("model/all_features.txt", "r").readline().split(',')
+            self.features = open("model/features.txt", "r").read().splitlines()
         except:
             # error if features file can't be found in the path
             logging.error("features.txt can\'t be found in the main directory")
@@ -88,7 +88,9 @@ class model:
     
     def load_data_csv(self,path):
         #load and preprocess the csv file
+        # self.data = pd.read_csv(path)
         self.data = convert_data(path)
+
         #for evaluation tasks, we will save the label
         if ('Label' in self.data.columns):
             self.label = self.data['Label'].to_numpy()
@@ -133,8 +135,8 @@ class model:
             accuracy = accuracy_score(self.label, self.prediction)
             return accuracy
 
-# m = model()
-# m.load_data_csv()
-# prediction = m.predict()
-# print(prediction)
+m = model()
+m.load_data_csv("model/data_examples/flows1.csv")
+prediction = m.predict()
+print(prediction)
 
