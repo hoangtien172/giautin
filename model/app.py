@@ -1,11 +1,9 @@
 from flask import Flask, render_template, request, jsonify
 from flask_socketio import SocketIO, emit
-# from py4j.java_gateway import JavaGateway
 from pwn import process
 import json
 from flask import Flask, render_template, request, jsonify, Response
 from flask_socketio import SocketIO, emit
-# from py4j.java_gateway import JavaGateway
 import requests
 
 
@@ -58,7 +56,7 @@ def create_app(test_config=None):
 
     req = False
     # start model_server
-    model_server = process('/Users/admin/Desktop/ktt/model/server.py')
+    model_server = process('model/server.py')
     # init javagetway 
     # geteway = JavaGateway()
     # app_get = geteway.entry_point
@@ -70,7 +68,7 @@ def create_app(test_config=None):
 
 
     # socketio = SocketIO(app, logger=True)
-    f = open('/Users/admin/Desktop/ktt/model/config.json','r')
+    f = open('model/config.json','r')
     config = json.load(f)
 
     @app.route('/',)
@@ -83,20 +81,19 @@ def create_app(test_config=None):
             print("Starting IDS")
             app_get.startTrafficFlow()
             
-        with open('file.json', 'r') as f:
+        with open('model/file.json', 'r') as f:
             first_line = f.readline()
         # Load the JSON data from the first line
         data1 = json.loads(first_line)
         data = {"status":status,
                 "auto_start":config["auto-start"],
                 "level_threat":config["level-threat"],
-                "reset_level":config["reset-level"],
-                "thinh": a}
+                "reset_level":config["reset-level"]}
         return render_template("index.html",**data,test=data1)
     
     @app.route('/get-result', methods=['GET'])
     def result():
-        with open('file.json', 'r') as f:
+        with open('model/file.json', 'r') as f:
             first_line = f.readline()
         # Load the JSON data from the first line
         data = json.loads(first_line)
@@ -154,7 +151,7 @@ def create_app(test_config=None):
             "DDoS attacks":0,
             "0":0
         }
-        with open('file.json', 'r+') as f:
+        with open('model/file.json', 'r+') as f:
             f.seek(0)
             f.write(json.dumps(data))
             f.truncate()
@@ -178,7 +175,7 @@ def create_app(test_config=None):
         global config
         server_url = "http://0.0.0.0:7777/post-predict"  # Thay đổi thành URL của server cung cấp kết quả phân tích
         
-        with open('file.json', 'r+') as f:
+        with open('model/file.json', 'r+') as f:
             f.seek(0)
             f.write(json.dumps(request.get_json()))
             f.truncate()

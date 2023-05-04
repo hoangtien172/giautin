@@ -21,12 +21,12 @@ if not os.path.exists(output_folder):
     os.makedirs(output_folder)
 
 
-def capture_packets(capture_duration=10000000, pcap_filename="captured_packets.pcap"):
+def capture_packets(capture_duration=10, pcap_filename="captured_packets.pcap"):
     # Bắt các gói tin trong khoảng thời gian capture_duration (giây)
     pcap_filename = f"{output_folder}/packets_{int(time.time())}.pcap"
     print(f"Capturing packets for {capture_duration} seconds...")
 
-    captured_packets = sniff(timeout=100000000, filter="ip", store=True)
+    captured_packets = sniff(timeout=10, filter="ip", store=True)
 
     # Ghi các gói tin đã bắt vào tập tin pcap_filename
     wrpcap(pcap_filename, captured_packets)
@@ -36,7 +36,7 @@ def capture_packets(capture_duration=10000000, pcap_filename="captured_packets.p
 
 def convert_pcap_to_csv(pcap_filename):
     csv_filename = pcap_filename.replace(".pcap", ".csv")
-    os.system(f"cicflowmeter -i {pcap_filename} -c {csv_filename}")
+    os.system(f"cicflowmeter -f {pcap_filename} -c {csv_filename}")
     print(f"Converted {pcap_filename} to {csv_filename}")
 
     return csv_filename
@@ -153,37 +153,19 @@ def server_program():
     host = "0.0.0.0"
     port = 5000 
 
-    # server_socket = socket.socket() 
-    # server_socket.bind((host, port)) 
-
-    # server_socket.listen(2)
-    # conn, address = server_socket.accept() 
     data = '' 
     # count = 0
     while True:
-        # pcap_filename = capture_packets()
-        # csv_filename = convert_pcap_to_csv(pcap_filename)
-        # print("------------", csv_filename)
-        csv_filename = '/Users/admin/Desktop/ktt/model/data_examples/flows1.csv'
+        pcap_filename = capture_packets()
+        csv_filename = convert_pcap_to_csv(pcap_filename)
+        print("------------", csv_filename)
+        # csv_filename = 'model/data_examples/flows1.csv'
         data = convert_data(csv_filename)
         if data is None:
             continue
         else:
         
 
-
-        # recv = conn.recv(2048)
-        
-        # data_temp = check_flow_return_string(recv)
-        # if not data_temp:
-           
-        #     continue
-        # data += str(data_temp) 
-        # count += 1
-        
-        # if (count == 10):
-            # try:
-            # m.load_data(data) 
             m.load_data_csv(csv_filename)
             results = m.predict()
             print(results)
@@ -206,14 +188,7 @@ def server_program():
             requests.post('http://0.0.0.0:7777/post-predict',json=predicted_results)
             data = '' 
             count = 0
-            # except Exception as e:cd 
-            #     print(e)
-            #     print("------------")
-            #     print(data)
-            #     print("------------")
-            #     pass
-            
-
+        
 
 if __name__ == '__main__':
     server_program()
