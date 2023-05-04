@@ -51,6 +51,11 @@ $(document).ready(function () {
 function reset_traffic(){
     $.post('/reset_traffic');
 }
+
+function reset_result() {
+  $.post("/reset_result");
+  location.reload();
+}
 //function to update the settings in config.json
 function update_settings() {
     console.log("update settings");
@@ -89,12 +94,14 @@ async function scan(e) {
       $('#scanning_text').html("SCANNING");
       await $.post('/start');
       socket.emit('request_predection');
+      location.reload();
     } else {
       $('#ss1').visible();
       $('#ss2').invisible();
       $('#scanning_text').html("SCAN <br> NETWORK");
       await $.post('/stop');
       socket.emit('stop_predection');
+      location.reload();
     }
   
   }

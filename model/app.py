@@ -3,7 +3,7 @@ from flask_socketio import SocketIO, emit
 # from py4j.java_gateway import JavaGateway
 from pwn import process
 import json
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, Response
 from flask_socketio import SocketIO, emit
 # from py4j.java_gateway import JavaGateway
 import requests
@@ -14,9 +14,11 @@ status = 'off'
 reset = 0
 reset_boolean = False
 
+
 def get_analysis_results_from_server(url):
     response = requests.get(url)
     if response.status_code == 200:
+        print(response.json())
         return response.json()
     else:
         return None
@@ -56,7 +58,7 @@ def create_app(test_config=None):
 
     req = False
     # start model_server
-    model_server = process('model/server.py')
+    model_server = process('/Users/admin/Desktop/ktt/model/server.py')
     # init javagetway 
     # geteway = JavaGateway()
     # app_get = geteway.entry_point
@@ -68,7 +70,7 @@ def create_app(test_config=None):
 
 
     # socketio = SocketIO(app, logger=True)
-    f = open('model/config.json','r')
+    f = open('/Users/admin/Desktop/ktt/model/config.json','r')
     config = json.load(f)
 
     @app.route('/',)
@@ -80,12 +82,26 @@ def create_app(test_config=None):
             status = 'on'
             print("Starting IDS")
             app_get.startTrafficFlow()
+            
+        with open('file.json', 'r') as f:
+            first_line = f.readline()
+        # Load the JSON data from the first line
+        data1 = json.loads(first_line)
         data = {"status":status,
                 "auto_start":config["auto-start"],
                 "level_threat":config["level-threat"],
-                "reset_level":config["reset-level"]}
-        return render_template("index.html",**data)
-
+                "reset_level":config["reset-level"],
+                "thinh": a}
+        return render_template("index.html",**data,test=data1)
+    
+    @app.route('/get-result', methods=['GET'])
+    def result():
+        with open('file.json', 'r') as f:
+            first_line = f.readline()
+        # Load the JSON data from the first line
+        data = json.loads(first_line)
+        return data
+    
     @app.route('/start',methods=['POST'])
     def start():
         global app_get
@@ -104,10 +120,11 @@ def create_app(test_config=None):
         # app_get.stopTrafficFlow()
         return "0"
     
-    @app.route('/info/<attack>',)
+    @app.route('/info/<attack>', methods=['GET'])
     def info(attack):
         return render_template(f"{attack}.html")
     
+        
     @app.route('/reset_traffic',methods=['POST'])
     def reset_traffic():
         global data
@@ -127,6 +144,22 @@ def create_app(test_config=None):
         }
         return "0"
     
+    @app.route('/reset_result',methods=['POST'])
+    def reset_result():
+        print("Result reset!")
+        data = {
+            "Bot":0,
+            "DoS attack":0,
+            "Brute Force":0,
+            "DDoS attacks":0,
+            "0":0
+        }
+        with open('file.json', 'r+') as f:
+            f.seek(0)
+            f.write(json.dumps(data))
+            f.truncate()
+        return "0"
+    
     @app.route('/update_settings',methods=['GET','POST'])
     def update_settings():
         global config
@@ -138,39 +171,19 @@ def create_app(test_config=None):
         config = data
         return jsonify(status="success")
     
-    # @app.route('/post-predict',methods=['POST'])
-    # def postpredict():
-    #     global data
-    #     global reset
-    #     global config
-    #     received = request.get_json() 
-    #     delta = reset*int(config['reset-level'])
-    #     print("Data received!")
-    #     for key in received:
-    #         data[key] = received[key]
-    #     '''if reset>0:
-    #           for key in data:
-    #               data[key] = data[key] % int(config['reset-level'])
-    #     '''
-    #     #data.clear()
-    #     # print(data)
-    #     return "1"
-
     @app.route('/post-predict', methods=['POST'])
     def postpredict():
         global data
         global reset
         global config
         server_url = "http://0.0.0.0:7777/post-predict"  # Thay đổi thành URL của server cung cấp kết quả phân tích
-        received_data = get_analysis_results_from_server(server_url)
-        if received_data is not None:
-            data = received_data
-            print("Data received!")
-            print(data)
-        else:
-            print("Failed to get data from the server")
+        
+        with open('file.json', 'r+') as f:
+            f.seek(0)
+            f.write(json.dumps(request.get_json()))
+            f.truncate()
+        print(request.get_json())
         return "1"
-
     
     @app.route('/reset_status',methods=['GET','POST'])
     def reset_status():
@@ -220,5 +233,5 @@ def create_app(test_config=None):
 
 if __name__ == '__main__':
     socketio, app = create_app()
-    socketio.run(app,host='0.0.0.0', port=555)
+    socketio.run(app,host='0.0.0.0', port=7777)
 

@@ -21,12 +21,12 @@ if not os.path.exists(output_folder):
     os.makedirs(output_folder)
 
 
-def capture_packets(capture_duration=10, pcap_filename="captured_packets.pcap"):
+def capture_packets(capture_duration=10000000, pcap_filename="captured_packets.pcap"):
     # Bắt các gói tin trong khoảng thời gian capture_duration (giây)
     pcap_filename = f"{output_folder}/packets_{int(time.time())}.pcap"
     print(f"Capturing packets for {capture_duration} seconds...")
 
-    captured_packets = sniff(timeout=capture_duration, filter="ip", store=True)
+    captured_packets = sniff(timeout=100000000, filter="ip", store=True)
 
     # Ghi các gói tin đã bắt vào tập tin pcap_filename
     wrpcap(pcap_filename, captured_packets)
@@ -161,10 +161,10 @@ def server_program():
     data = '' 
     # count = 0
     while True:
-        pcap_filename = capture_packets()
-        csv_filename = convert_pcap_to_csv(pcap_filename)
-        print("------------", csv_filename)
-        csv_filename = 'model/data_examples/flows1.csv'
+        # pcap_filename = capture_packets()
+        # csv_filename = convert_pcap_to_csv(pcap_filename)
+        # print("------------", csv_filename)
+        csv_filename = '/Users/admin/Desktop/ktt/model/data_examples/flows1.csv'
         data = convert_data(csv_filename)
         if data is None:
             continue

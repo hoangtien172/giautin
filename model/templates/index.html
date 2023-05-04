@@ -4,7 +4,7 @@
   <link rel="stylesheet" href="/static/css/bootstrap.min.css">
   <link rel="stylesheet" href="/static/css/style.css">
   <link rel="icon" href="/static/img/shield.png" />
-  <title>ESI IDS</title>
+  <title>PTIT</title>
 </head>
 <script src="/static/js/jquery-3.5.1.min.js"></script>
 <script src="/static/js/bootstrap.min.js"></script>
@@ -12,7 +12,7 @@
 <body>
   <div class="container-fluid" style="padding:0">
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
-      <a class="navbar-brand" href="#"><img src="/static/img/logo_white.svg" alt="logo"></a>
+      <a class="btn" style="color: white;" href="#">Bài Tập Lớn môn Kỹ Thuật Giấu Tin</a>
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
@@ -23,7 +23,7 @@
         <ul class="my-2 my-lg-0 nav nav-pills">
           <li class="nav-item" style="margin-right: 30px;">
             <button class="btn" style="color: white;">
-              <b href="#" style="font-size: 14px; "> <span></span>About Us</b>
+              <b href="#" style="font-size: 14px; "> <span></span>PTIT</b>
             </button>
           </li>
           <li class="nav-item" style="">
@@ -54,6 +54,20 @@
       <div style="width: 100%; text-align: center; margin-bottom: 10px; margin-top: 10px;">
         <b id="ss2">We are inspecting the traffic of your network for any suspicious activity</b>
       </div>
+      <div>
+      <b >Suspicious activities</b>
+      <br>
+      Bot: <a href="http://127.0.0.1:7777//info/bot">{{ test['Bot'] }} </a>
+      <br>
+      DoS attack: <a href="http://127.0.0.1:7777//info/DoS attack">{{ test['DoS attack'] }} </a> 
+      <br>
+      Brute Force: <a href="http://127.0.0.1:7777//info/Brute Force">{{ test['Brute Force'] }} </a> 
+      <br>
+      DDoS attacks: <a href="http://127.0.0.1:7777//info/DDoS attacks">{{ test['DDoS attacks'] }} </a> 
+      <br>
+      <span> None: {{ test['0'] }} </span>
+      </div>
+        <button onclick="reset_result()"> Reset results</button>
     </div>
   </div>
   <div class="modal fade attackModal" id='settings' tabindex="-1" role="dialog" aria-labelledby="settings"
@@ -130,6 +144,7 @@
     var status = '{{ status }}';
     console.log(levelofthreat);
     console.log(resetlevel);
+    console.log(status)
     $("#levelofthreat").val(levelofthreat);
     $("#resetlevel").val(resetlevel);
     if (autostart_toggle==0){
@@ -137,6 +152,23 @@
     }else{
       $('#autostart-toggle').prop("checked", true);
     }
+
+    function updateData() {
+  $.get('/get-result', function(data) {
+    var test = data;
+    console.log(test)
+    // Update the HTML content with the new data
+    $('a[href$="/info/bot"]').text(test['Bot']);
+    $('a[href$="/info/DoS attack"]').text(test['DoS attack']);
+    $('a[href$="/info/Brute Force"]').text(test['Brute Force']);
+    $('a[href$="/info/DDoS attacks"]').text(test['DDoS attacks']);
+    $('span:contains("None:")').text('None: ' + test['0']);
+  });
+}
+
+ if (status == 'on') {
+    setInterval(updateData, 1000);
+  }
   </script>
   <script type=text/javascript src="/static/js/script.js"></script>
   <script>reset_traffic();</script>
